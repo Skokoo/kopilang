@@ -1,5 +1,7 @@
 # kopilang
-kopilang is a fast, high-level programming language inspired by coffee.
+kopilang is a very fast, high-level programming language inspired by coffee.
+
+your code is directly translated into machine language, no one will bother you unlike an interpreted language
 
 # syntax
 use .kopi file extensions and end every block boundary with a trailing comma ",".
