@@ -76,4 +76,36 @@ void print_str(char *s) {
     );
 }
 
+long read_num() {
+    char buf[32] = {0};
+    long val = 0;
+    int sign = 1;
+    long len = 0;
+    char *ptr = buf;
+    __asm__ __volatile__ (
+        "mov x0, #0\n"
+        "mov x1, %1\n"
+        "mov x2, #32\n"
+        "mov x8, #63\n"
+        "svc #0\n"
+        "mov %0, x0\n"
+        : "=r"(len)
+        : "r"(ptr)
+        : "x0", "x1", "x2", "x8", "memory"
+    );
+    int i = 0;
+    while (i < len && isspace((unsigned char)buf[i])) i++;
+    if (i < len && buf[i] == '-') {
+        sign = -1;
+        i++;
+    } else if (i < len && buf[i] == '+') {
+        i++;
+    }
+    while (i < len && isdigit((unsigned char)buf[i])) {
+        val = val * 10 + (buf[i] - '0');
+        i++;
+    }
+    return val * sign;
+}
+
 #endif
