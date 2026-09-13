@@ -30,9 +30,28 @@ SAY "Value: !a\e[0m"
 ```text
 INTEGER wow = 200,
 IF wow == 200 <,
-    SAY "wow var matches.\n",
+SAY "wow var matches.\n",
 >
 ```
+## code example
+guess the number.
+```text
+INTEGER secret_number = 7,
+INTEGER user_guess = 0,
+
+SAY "welcome to the guess game.\n",
+SAY "enter a number between 1 and 10: ",
+INPUT "!user_guess",
+
+IF user_guess == 7 <,
+SAY "\e[1;32mcongrats, your guess is right.\n\e[0m",
+>,
+
+IF user_guess != 7 <,
+SAY "\e[1;31mleft guess.\n\e[0m",
+>
+```
+oh right, no need for indentation in this programming language
 
 # how to use
 clone the repository and ensure **binutils** is installed:
