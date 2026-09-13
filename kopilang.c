@@ -24,6 +24,8 @@ int main(int argc, char *argv[]) {
     const int max_var = 50;
     Var db[max_var];
     int count = 0, has_err = 0;
+    int condition_status = 1;
+    int inside_if_block = 0;
 
     for (int i = 0; i < total_lines; i++) {
         static char raw_backup[256];
@@ -52,10 +54,25 @@ int main(int argc, char *argv[]) {
             }
         }
 
+        if (strcmp(cleaned, ">") == 0) {
+            inside_if_block = 0;
+            condition_status = 1;
+            continue;
+        }
+
+        if (inside_if_block && !condition_status) {
+            continue;
+        }
+
         if (strncmp(cleaned, "INTEGER", 7) == 0) {
             do_int(argv[1], raw_backup, cleaned, db, &count, current_line_num, &has_err);
         } else if (strncmp(cleaned, "SAY", 3) == 0) {
             do_say(argv[1], raw_backup, cleaned, db, count, current_line_num, &has_err);
+        } else if (strncmp(cleaned, "IF", 2) == 0) {
+            inside_if_block = 1;
+            do_if(argv[1], raw_backup, cleaned, db, count, current_line_num, &has_err, &condition_status);
+        } else if (strncmp(cleaned, "INPUT", 5) == 0) {
+            do_input(argv[1], raw_backup, cleaned, db, count, current_line_num, &has_err);
         } else {
             printf("\033[1m%s:%d:1: \033[1;31msyntax error:\033[0m\033[1m unknown token -> \"%s\"\033[0m\n", argv[1], current_line_num, cleaned);
             printf(" |\n | %s\n |\n", raw_backup);
