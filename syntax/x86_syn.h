@@ -23,9 +23,9 @@ void x86_put(char *s) {
 }
 
 void x86_num(long v) {
-    char bf[32];
+    char bf;
     int i = 30;
-    bf[31] = '\n';
+    bf = '\n';
     long tm = v;
     if (v < 0) tm = -v;
     do {
@@ -46,7 +46,7 @@ void x86_num(long v) {
 }
 
 long x86_get() {
-    char bf[32] = {0};
+    char bf = {0};
     long vl = 0;
     int sg = 1;
     long ln = 0;
@@ -72,7 +72,7 @@ long x86_get() {
 }
 
 void do_int_x86(char *fn, char *rw, char *cm, Var *db, int *cn, int l, int *er) {
-    char nm[64] = {0}, ex[256] = {0};
+    char nm = {0}, ex = {0};
     if (sscanf(cm, "INTEGER %63s = %255[^\n]", nm, ex) != 2) {
         printf("\033[1m%s:%d:1: \033[1;31merror:\033[0m\033[1m invalid INTEGER format\033[0m\n", fn, l);
         printf(" |\n | %s\n |\n", rw);
@@ -88,7 +88,7 @@ void do_int_x86(char *fn, char *rw, char *cm, Var *db, int *cn, int l, int *er) 
     else if (strchr(cex, '/')) op = '/';
 
     if (op != 0) {
-        char a1[64] = {0}, a2[64] = {0}, fm[32];
+        char a1 = {0}, a2 = {0}, fm;
         sprintf(fm, "%%63s %c %%63s", op);
         sscanf(cex, fm, a1, a2);
         int i1 = get_idx(db, *cn, trim(a1));
@@ -126,17 +126,17 @@ void do_say_x86(char *fn, char *rw, char *cm, Var *db, int cn, int l, int *er) {
         return;
     }
     int rl = q2 - q1 - 1;
-    char ct[512] = {0};
+    char ct = {0};
     if (rl > 510) rl = 510;
     strncpy(ct, q1 + 1, rl);
-    static char pr[512];
+    static char pr;
     memset(pr, 0, sizeof(pr));
     int pi = 0;
     for (int i = 0; ct[i] != '\0'; i++) {
         if (ct[i] == '\\' && ct[i+1] == 'e') { pr[pi++] = 0x1B; i++; }
         else if (ct[i] == '\\' && ct[i+1] == 'n') { pr[pi++] = '\n'; i++; }
         else if (ct[i] == '!') {
-            char tg[64] = {0};
+            char tg = {0};
             int vl = 0;
             int st = i + 1;
             while (ct[st] != '\0' && !isspace((unsigned char)ct[st]) && ct[st] != '\\' && ct[st] != '"' && vl < 63) {
@@ -145,18 +145,18 @@ void do_say_x86(char *fn, char *rw, char *cm, Var *db, int cn, int l, int *er) {
             tg[vl] = '\0';
             int id = get_idx(db, cn, tg);
             if (id != -1) {
-                char nb[32];
+                char nb;
                 sprintf(nb, "%ld", db[id].val);
                 for (int b = 0; nb[b] != '\0'; b++) pr[pi++] = nb[b];
                 i += vl;
             } else { pr[pi++] = '!'; }
         } else { pr[pi++] = ct[i]; }
     }
-    x86_print_str(pr);
+    x86_put(pr);
 }
 
 void do_if_x86(char *fn, char *rw, char *cm, Var *db, int cn, int l, int *er, int *ab) {
-    char cp[256] = {0};
+    char cp = {0};
     if (sscanf(cm, "IF %[^\n]", cp) != 1) {
         printf("\033[1m%s:%d:1: \033[1;31merror:\033[0m\033[1m invalid IF syntax\033[0m\n", fn, l);
         *er = 1;
@@ -171,7 +171,7 @@ void do_if_x86(char *fn, char *rw, char *cm, Var *db, int cn, int l, int *er, in
     }
     cc[ln - 1] = '\0';
     cc = trim(cc);
-    char vn[64] = {0}, op[8] = {0};
+    char vn = {0}, op = {0};
     long vv = 0;
     if (strstr(cc, "==")) { strcpy(op, "=="); sscanf(cc, "%63s == %ld", vn, &vv); }
     else if (strstr(cc, "!=")) { strcpy(op, "!="); sscanf(cc, "%63s != %ld", vn, &vv); }
@@ -183,12 +183,12 @@ void do_if_x86(char *fn, char *rw, char *cm, Var *db, int cn, int l, int *er, in
     if (id == -1) { printf("\033[1m%s:%d:1: \033[1;31mruntime error:\033[0m\033[1m variable '%s' undefined\033[0m\n", fn, l, vn); *er = 1; return; }
     long v1 = db[id].val;
     long ps = 0;
-    if (strcmp(op, "==") == 0) { __asm__("cmp %2, %1\n sete %b0" : "=q"(ps) : "r"(v1), "r"(vv)); }
-    else if (strcmp(op, "!=") == 0) { __asm__("cmp %2, %1\n setne %b0" : "=q"(ps) : "r"(v1), "r"(vv)); }
-    else if (strcmp(op, ">=") == 0) { __asm__("cmp %2, %1\n setge %b0" : "=q"(ps) : "r"(v1), "r"(vv)); }
-    else if (strcmp(op, "<=") == 0) { __asm__("cmp %2, %1\n setle %b0" : "=q"(ps) : "r"(v1), "r"(vv)); }
-    else if (strcmp(op, ">") == 0) { __asm__("cmp %2, %1\n setg %b0" : "=q"(ps) : "r"(v1), "r"(vv)); }
-    else if (strcmp(op, "<") == 0) { __asm__("cmp %2, %1\n setl %b0" : "=q"(ps) : "r"(v1), "r"(vv)); }
+    if (strcmp(op, "==") == 0) { __asm__("cmp %2, %1\n sete %%al\n movzbl %%al, %0" : "=r"(ps) : "r"(v1), "r"(vv) : "cc"); }
+    else if (strcmp(op, "!=") == 0) { __asm__("cmp %2, %1\n setne %%al\n movzbl %%al, %0" : "=r"(ps) : "r"(v1), "r"(vv) : "cc"); }
+    else if (strcmp(op, ">=") == 0) { __asm__("cmp %2, %1\n setge %%al\n movzbl %%al, %0" : "=r"(ps) : "r"(v1), "r"(vv) : "cc"); }
+    else if (strcmp(op, "<=") == 0) { __asm__("cmp %2, %1\n setle %%al\n movzbl %%al, %0" : "=r"(ps) : "r"(v1), "r"(vv) : "cc"); }
+    else if (strcmp(op, ">") == 0) { __asm__("cmp %2, %1\n setg %%al\n movzbl %%al, %0" : "=r"(ps) : "r"(v1), "r"(vv) : "cc"); }
+    else if (strcmp(op, "<") == 0) { __asm__("cmp %2, %1\n setl %%al\n movzbl %%al, %0" : "=r"(ps) : "r"(v1), "r"(vv) : "cc"); }
     *ab = ps ? 1 : 0;
 }
 
@@ -197,11 +197,11 @@ void do_input_x86(char *fn, char *rw, char *cm, Var *db, int cn, int l, int *er)
     char *q2 = strrchr(cm, '"');
     if (!q1 || !q2 || q1 == q2) { printf("\033[1m%s:%d:1: \033[1;31merror:\033[0m\033[1m matching quotes required for INPUT\033[0m\n", fn, l); *er = 1; return; }
     int ln = q2 - q1 - 1;
-    char tg[256] = {0};
+    char tg = {0};
     if (ln > 255) ln = 255;
     strncpy(tg, q1 + 1, ln);
     char *ctg = trim(tg);
-    if (ctg[0] != '!') { printf("\033[1m%s:%d:1: \033[1;31merror:\033[0m\033[1m INPUT target must start with '!'\033[0m\n", fn, l); *er = 1; return; }
+    if (ctg != '!') { printf("\033[1m%s:%d:1: \033[1;31merror:\033[0m\033[1m INPUT target must start with '!'\033[0m\n", fn, l); *er = 1; return; }
     char *vn = trim(ctg + 1);
     int id = get_idx(db, cn, vn);
     if (id == -1) { printf("\033[1m%s:%d:1: \033[1;31mruntime error:\033[0m\033[1m variable '%s' undefined\033[0m\n", fn, l, vn); *er = 1; return; }
