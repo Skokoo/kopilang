@@ -61,4 +61,5 @@ cd kopilang
 ```
 
 **ARM64:** `clang kopilang.c -o kopi && ./kopi [file.kopi]`
+
 **x86_64:** `clang kopilangx86.c -o kopi && ./kopi [file.kopi]`
